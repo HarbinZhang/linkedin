@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from scawler/scawler import Scawler
+from scawler import Scawler
 
 
 username = 'haibin610@yeah.net'
@@ -10,7 +10,7 @@ url = 'https://www.linkedin.com/in/haibinzhang'
 
 if __name__ == '__main__':
     scawler = Scawler(username,password)
-    scawler.deal(0)
+    scawler.deal(10)
     # scawler.dealNew(url)
 
     # ceshi"url_id" : "haibinzhang"
