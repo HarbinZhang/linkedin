@@ -10,7 +10,7 @@ url = 'https://www.linkedin.com/in/haibinzhang'
 
 if __name__ == '__main__':
     scawler = Scawler(username,password)
-    scawler.deal(10)
+    scawler.deal(1)
     # scawler.dealNew(url)
 
     # ceshi"url_id" : "haibinzhang"
