@@ -21,7 +21,7 @@ class Scawler(object):
         client = pymongo.MongoClient("localhost", 27017)
         self.db = client.mydb
 
-        phantomjsdriver = "/Users/Harbin/Desktop/mine/vagrant/site/linkedin/lib/phantomjs"
+        phantomjsdriver = "../lib/phantomjs"
         os.environ["webdriver.phantomjs.driver"] = phantomjsdriver
         self.driver = webdriver.PhantomJS(phantomjsdriver)
         self.login()
