@@ -1,3 +1,4 @@
+#!/bin/sh
 import cookielib
 import os
 import re
@@ -5,7 +6,6 @@ import string
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 import pymongo
 from time import sleep
 import random
