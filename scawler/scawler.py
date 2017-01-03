@@ -16,7 +16,7 @@ class Scawler(object):
         self.username = username
         self.password = password
         self.cnt = 0
-        self.broken = False
+        self.fault_cnt = 0
 
         client = pymongo.MongoClient("localhost", 27017)
         self.db = client.mydb
@@ -66,6 +66,7 @@ class Scawler(object):
                 backgrounds.append(background + [])
             return backgrounds
         except:
+            self.fault_cnt += 1
             return None
 
     def getSkills(self, soup):
@@ -86,7 +87,7 @@ class Scawler(object):
             f.write(self.driver.current_url)
             f.write('\n')
             f.close()
-            self.broken = True
+            self.fault_cnt += 1            
             print "Oh, That's bad.."
 
 
@@ -114,31 +115,37 @@ class Scawler(object):
             name = soup.find(id="name").getText()
         except:
             name = None
+            self.fault_cnt += 1
         # locality
         try:
             locality = soup.find("span",{"class":"locality"}).getText()
         except:
             locality = None
+            self.fault_cnt += 1
         # title
         try:
             title = soup.find("p",{"class":"title"}).getText()
         except:
             title = None
+            self.fault_cnt += 1
         # industry
         try:
             industry = soup.find("a",{"name":"industry"}).getText()
         except:
             industry = None
+            self.fault_cnt += 1
         # curt_company
         try:
             curt_company = soup.find("a",{"name":"company"}).getText()
         except:
             curt_company = None
+            self.fault_cnt += 1
         # edu
         try:
             edu = soup.find("a",{"title":"More details for this school"}).getText()
         except:
             edu = None
+            self.fault_cnt += 1
 
         backgrounds = self.getBackground(soup)
 
@@ -156,6 +163,11 @@ class Scawler(object):
             "topskills":topskills
         }
 
+
+        if self.fault_cnt >=6:
+            #bad
+            print "Oh, it's bad.."
+            return False
         # print ans
         # save it
         try:
@@ -166,9 +178,9 @@ class Scawler(object):
             f.write('\n')
             f.close()
 
-        if not self.broken:
-            self.db.linkedinDedual.insert({"url_id":url_id})
 
+        self.db.linkedinDedual.insert({"url_id":url_id})
+        return True
 
     def loadPage(self):
         # self.driver.get(url)
@@ -185,7 +197,8 @@ class Scawler(object):
         links.close()
 
         # save Profile
-        self.saveProfile(soup)
+        return self.saveProfile(soup)
+
 
 
     def preLoad(self, url):
@@ -206,30 +219,33 @@ class Scawler(object):
             print "new one, be going to do it : "+str(self.cnt)+" / "+str(self.num)
             return True
 
-    def popUrl(self, num):
-        lines = open('relatedLinks').readlines()
-        if num >= len(lines):
-            num = len(lines) - 1 
-        open('relatedLinks', 'w').writelines(lines[num: -1])
-        return lines[0:num]
+    # def popUrl(self, num):
+    #     lines = open('relatedLinks').readlines()
+    #     if num >= len(lines):
+    #         num = len(lines) - 1 
+    #     open('relatedLinks', 'w').writelines(lines[num: -1])
+    #     return lines[0:num]
 
-    def deal(self, num = 1):
-        self.num = num
-        urls = self.popUrl(num)
-        while len(urls) > 0:
-            url = urls.pop()
-            t = 1+ random.randint(1,1000)/1000.0
-            print "sleep : "+ str(t) + " s"
-            sleep(1+ random.randint(1,1000)/1000.0)
-            if self.preLoad(url):
-                self.loadPage()
+    # def deal(self, num = 1):
+    #     self.num = num
+    #     urls = self.popUrl(num)
+    #     while len(urls) > 0:
+    #         url = urls.pop()
+    #         t = 1+ random.randint(1,1000)/1000.0
+    #         print "sleep : "+ str(t) + " s"
+    #         sleep(1+ random.randint(1,1000)/1000.0)
+    #         if self.preLoad(url):
+    #             if not self.loadPage():
+    #                 break
+    #     if len(urls) > 0:
+    #         open('relatedLinks', 'ab').writelines(urls)
+        
+    #     self.driver.close()
 
-        self.driver.close()
 
-
-    def dealNew(self, url):
-        if self.preLoad(url):
-            self.loadPage()
+    # def dealNew(self, url):
+    #     if self.preLoad(url):
+    #         self.loadPage()
 
 
 
