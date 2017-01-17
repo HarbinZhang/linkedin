@@ -12,15 +12,15 @@ DEFAULT_NUM = 1
     default=DEFAULT_PORT_NUM,
     help="The port the master is listening on, default " + str(DEFAULT_PORT_NUM))
 
-# @click.option("--num", "-n", "num",
-#     default=DEFAULT_NUM,
-#     help="The num of urls is listening on, default " + str(DEFAULT_NUM))
+@click.option("--num", "-n", "num",
+    default=DEFAULT_NUM,
+    help="The num of urls is listening on, default " + str(DEFAULT_NUM))
 
-def main(port_number=DEFAULT_PORT_NUM):
+def main(port_number=DEFAULT_PORT_NUM, num=DEFAULT_NUM):
     # Temp job to send to master (values can be changed)
     job_dict = {
         "message_type": "new_master_job",
-        "num":DEFAULT_NUM
+        "num":num
     }
 
 

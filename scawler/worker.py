@@ -39,7 +39,7 @@ class Worker:
 		max_data = 1024
 		while True:
 			conn, addr = worker_tcp.accept()
-			print('worker connected')
+			#print('worker connected')
 			new_job = ""
 			while True:
 				message = conn.recv(max_data)
@@ -54,14 +54,19 @@ class Worker:
 			return
 		if job['message_type'] == 'new_job':
 			t = 6.0 + random.randint(1,1000)/200.0
-			print "sleep : "+ str(t) + " s"			
+			print "worker : " + str(self.worker_id) + " sleep : "+ str(t) + " s"	
+			sleep(t)		
 			url = job['url']
 			self.index = job['index']
+			self.num = job['num']
+			self.fault_cnt = 0
 			if self.preLoad(url):
 				if self.loadPage():
 					self.send_status_message('ready')
 				else:
 					self.send_status_message('bad')
+			else:
+				self.send_status_message('ready')
 		elif job['message_type'] == 'shutdown':
 			self.driver.close()
 			print "driver has been closed : " + str(self.worker_id)
@@ -163,20 +168,6 @@ class Worker:
 			self.fault_cnt += 1            
 
 
-		# I don't know why it cannot work
-		# try: 
-		#     res = soup.find(id="profile-skills").getText()
-		#     num = res.findAll("span", {"class": "num-endorsements"})
-		#     skills = res.findAll("span", {"class": "endorse-item-name"})
-		#     topskills = {}
-		#     for i in range(len(num)):
-		#         tmp = str(skills[i].getText()).split('.')[0]
-		#         # tmp = tmp.split('$')[0]
-		#         print tmp
-		#         topskills[tmp] = int(num[i].getText())
-		#     return topskills
-		# except:
-		#     return None
 
 	def saveProfile(self, soup):
 		# url_id
@@ -235,9 +226,13 @@ class Worker:
 			"topskills":topskills
 		}
 
-
+		print ("worker_id is : "+str(self.worker_id)+" url_id : " + str(url_id))
 		if self.fault_cnt >=6:
 			#bad
+			f = open('siton','ab')
+			f.write(str(ans))
+			f.write('\n')
+			f.close()			
 			print "Oh, it's bad.."
 			return False
 		# print ans
@@ -249,8 +244,7 @@ class Worker:
 			f.write(str(ans))
 			f.write('\n')
 			f.close()
-
-
+			
 		self.db.linkedinDedual.insert({"url_id":url_id})
 		return True
 
@@ -283,10 +277,10 @@ class Worker:
 
 		curtUrls = self.driver.current_url.split('/')[4]
 		url_id = curtUrls.split('?')[0]
-		self.cnt += 1
+
 		if self.db.linkedinDedual.find({"url_id":url_id}).count() != 0:
-			print "already dealed : " + str(self.index)
+			print "already dealed : " + str(self.index) + ' / ' + str(self.num)
 			return False
 		else:
-			print "new one, be going to do it : " + str(self.index)
+			print "new one, be going to do it : " + str(self.index) + ' / ' + str(self.num)
 			return True

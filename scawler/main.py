@@ -1,4 +1,3 @@
-from scawler import Scawler
 from multiprocessing import Process
 import master
 
